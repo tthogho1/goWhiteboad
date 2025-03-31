@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"goWhiteBoard/util"
+	"log"
+	"os"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -9,6 +12,8 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/widget"
+
+	"github.com/joho/godotenv"
 )
 
 var (
@@ -17,7 +22,12 @@ var (
 )
 
 // 修正：完全な実装での確認コード
-func main() {
+func main1() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	a := app.New()
 	w := a.NewWindow("Whiteboard")
 	w.Resize(fyne.NewSize(BOARD_WIDTH, BOARD_HEIGHT))
@@ -56,9 +66,21 @@ func main() {
 		centerContainer.Objects = []fyne.CanvasObject{board}
 		centerContainer.Refresh()
 	})
+
+	// 画像送信ボタン（）
+	sendButton := widget.NewButton("Send", func() {
+		imagePath := "whiteboard.png" // 読み込むPNG画像のファイルパスを指定
+		imageData, err := os.ReadFile(imagePath)
+		if err != nil {
+			log.Fatalf("画像の読み込みに失敗しました: %v", err)
+		}
+
+		util.SendImage(imageData)
+	})
+
 	// メインコンテナ
 	content := container.NewBorder(
-		container.NewHBox(clearButton, saveButton, backButton),
+		container.NewHBox(clearButton, saveButton, backButton, sendButton),
 		nil,
 		nil,
 		nil,

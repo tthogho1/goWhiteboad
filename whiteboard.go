@@ -85,11 +85,11 @@ func (w *whiteboard) CreateRenderer() fyne.WidgetRenderer {
 
 // desktop.Hoverable を実装
 func (w *whiteboard) MouseIn(*desktop.MouseEvent) {
-	fmt.Fprintln(os.Stdout, "mouse in")
+	// fmt.Fprintln(os.Stdout, "mouse in")
 }
 
 func (w *whiteboard) MouseOut() {
-	fmt.Fprintln(os.Stdout, "mouse out")
+	// fmt.Fprintln(os.Stdout, "mouse out")
 }
 
 // desktop.Mousable を実装
@@ -119,7 +119,7 @@ func (w *whiteboard) MouseUp(ev *desktop.MouseEvent) {
 }
 
 func (w *whiteboard) MouseMoved(ev *desktop.MouseEvent) {
-	fmt.Fprintf(os.Stdout, "mousemove at %v\n", ev.Position)
+	//fmt.Fprintf(os.Stdout, "mousemove at %v\n", ev.Position)
 	if w.drawing {
 		w.currentLine.points = append(w.currentLine.points, ev.Position)
 		w.Refresh()

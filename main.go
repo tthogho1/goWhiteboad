@@ -14,6 +14,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 
 	"github.com/joho/godotenv"
+	webview "github.com/webview/webview_go"
 )
 
 var (
@@ -22,7 +23,7 @@ var (
 )
 
 // 修正：完全な実装での確認コード
-func main1() {
+func main() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
@@ -67,7 +68,7 @@ func main1() {
 		centerContainer.Refresh()
 	})
 
-	// 画像送信ボタン（）
+	// 画像送信ボタン。送信した結果をhtmlで受け取る。
 	sendButton := widget.NewButton("Send", func() {
 		imagePath := "whiteboard.png" // 読み込むPNG画像のファイルパスを指定
 		imageData, err := os.ReadFile(imagePath)
@@ -75,7 +76,13 @@ func main1() {
 			log.Fatalf("画像の読み込みに失敗しました: %v", err)
 		}
 
-		util.SendImage(imageData)
+		htmlContent := util.SendImage(imageData)
+		// TODO: HTMLを画面に表示する
+		w := webview.New(true)
+		w.SetTitle("Whiteboard")
+		w.SetSize(int(BOARD_WIDTH), int(BOARD_HEIGHT), webview.HintNone)
+		w.SetHtml(htmlContent)
+		w.Run()
 	})
 
 	// メインコンテナ

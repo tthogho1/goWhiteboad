@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 )
 
 type MessageContentSource struct {
@@ -50,7 +51,14 @@ type ResponseBody struct {
 	Content []ContentItem `json:"content"` // content 配列
 }
 
-func SendImage(imageData []byte) {
+func removeCodeTags(input string) string {
+	// Remove the opening and closing ``````
+	result := strings.ReplaceAll(input, "```html", "")
+	result = strings.ReplaceAll(result, "```", "")
+	return result
+}
+
+func SendImage(imageData []byte) string {
 	// OpenAI APIキーを設定
 	apiKey := os.Getenv("API_KEY")
 	endpoint := os.Getenv("END_POINT")
@@ -63,7 +71,9 @@ func SendImage(imageData []byte) {
 	base64Encoded := base64.StdEncoding.EncodeToString(imageData)
 
 	system_message := "You are an Web Designer and image editor. You can edit the image. You can return image which improved. no Explanation just image."
-	user_message := "Create improve image  from the freehands image of this and return only improved image by html. Draw basic clean image. No Explanation return just html."
+	//user_message := "Create improve image  from the freehands image of this and return only improved image by html. Draw basic clean image. No Explanation return just html."
+	user_message := "This freehand image should be neatly formatted and converted with basic Shapes like straight line, circle or square,etc  " +
+		" back to HTML and CSS. No explanation is required, just return the HTML."
 	//user_message := "Describe this image."
 	// リクエストボディを構築
 	requestBody := RequestBody{
@@ -127,8 +137,9 @@ func SendImage(imageData []byte) {
 
 	// 結果を出力
 	if len(response.Content) > 0 {
-		fmt.Println(response.Content[0].Text)
+		return removeCodeTags(response.Content[0].Text)
 	} else {
 		fmt.Println("No response content found.")
+		return ""
 	}
 }

@@ -97,10 +97,10 @@ func (w *whiteboard) MouseDown(ev *desktop.MouseEvent) {
 	w.drawing = true
 	w.currentLine = line{
 		points: []fyne.Position{ev.Position},
-		color:  color.Black,
-		width:  2,
+		color:  w.currentLine.color,
+		width:  w.currentLine.width,
 	}
-	fmt.Fprintf(os.Stdout, "mousedown at %v\n", ev.Position)
+	// fmt.Fprintf(os.Stdout, "mousedown at %v\n", ev.Position)
 	w.Refresh()
 }
 
@@ -111,10 +111,10 @@ func (w *whiteboard) MouseUp(ev *desktop.MouseEvent) {
 	}
 	w.currentLine = line{
 		points: []fyne.Position{},
-		color:  color.Black,
-		width:  2,
+		color:  w.currentLine.color,
+		width:  w.currentLine.width,
 	}
-	fmt.Fprintf(os.Stdout, "mouseup at %v\n", ev.Position)
+	// fmt.Fprintf(os.Stdout, "mouseup at %v\n", ev.Position)
 	w.Refresh()
 }
 

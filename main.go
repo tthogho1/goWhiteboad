@@ -17,6 +17,7 @@ import (
 	webview "github.com/webview/webview_go"
 )
 
+// Initial board dimensions that will be updated when window is resized
 var (
 	BOARD_WIDTH  float32 = 800
 	BOARD_HEIGHT float32 = 600
@@ -51,8 +52,47 @@ func main() {
 		board.Refresh()
 	})
 
+	// Create a function to update board dimensions based on window size
+	updateBoardDimensions := func() {
+		size := w.Canvas().Size()
+		BOARD_WIDTH = size.Width
+		BOARD_HEIGHT = size.Height
+		fmt.Printf("Window size: %v x %v\n", BOARD_WIDTH, BOARD_HEIGHT)
+	}
+
+	// Add a resize listener using a custom approach
+	resizeListener := widget.NewLabel("")
+	resizeListener.Hide()
+	resizeListener.Resize(fyne.NewSize(1, 1))
+
+	// Add a resize callback to the window content
+	var lastSize fyne.Size
+
+	// Create a custom widget that will detect size changes
+	sizeDetector := widget.NewLabel("")
+	sizeDetector.Hide()
+
+	// Set up a callback that will be triggered on each render
+	w.Canvas().SetOnTypedRune(func(r rune) {
+		// This is just a hook to get called regularly
+		currentSize := w.Canvas().Size()
+		if currentSize != lastSize {
+			lastSize = currentSize
+			updateBoardDimensions()
+		}
+	})
+
+	// Also update dimensions when buttons are clicked
+	clearButton.OnTapped = func() {
+		updateBoardDimensions()
+		board.lines = []line{}
+		board.Refresh()
+	}
+
 	// 画像生成ボタン
 	saveButton := widget.NewButton("SavePng", func() {
+		// Update dimensions before saving
+		updateBoardDimensions()
 		board.SaveAsPNG("whiteboard.png", int(BOARD_WIDTH), int(BOARD_HEIGHT))
 
 		img := canvas.NewImageFromFile("whiteboard.png")
@@ -70,6 +110,9 @@ func main() {
 
 	// 画像送信ボタン。送信した結果をhtmlで受け取る。
 	sendButton := widget.NewButton("Send", func() {
+		// Update dimensions before sending
+		updateBoardDimensions()
+
 		imagePath := "whiteboard.png" // 読み込むPNG画像のファイルパスを指定
 		imageData, err := os.ReadFile(imagePath)
 		if err != nil {
@@ -78,20 +121,25 @@ func main() {
 
 		htmlContent := util.SendImage(imageData)
 		// TODO: HTMLを画面に表示する
-		w := webview.New(true)
-		w.SetTitle("Whiteboard")
-		w.SetSize(int(BOARD_WIDTH), int(BOARD_HEIGHT), webview.HintNone)
-		w.SetHtml(htmlContent)
-		w.Run()
+		wv := webview.New(true)
+		wv.SetTitle("Whiteboard")
+		wv.SetSize(int(BOARD_WIDTH), int(BOARD_HEIGHT), webview.HintNone)
+		wv.SetHtml(htmlContent)
+		wv.Run()
+	})
+
+	// 設定ボタン
+	settingsButton := widget.NewButton("Settings", func() {
+		ShowSettingDialog(w, board)
 	})
 
 	// メインコンテナ
 	content := container.NewBorder(
-		container.NewHBox(clearButton, saveButton, backButton, sendButton),
+		container.NewHBox(clearButton, saveButton, backButton, sendButton, settingsButton),
 		nil,
 		nil,
 		nil,
-		centerContainer,
+		container.NewStack(centerContainer, sizeDetector, resizeListener),
 	)
 
 	w.SetContent(content)
@@ -101,6 +149,9 @@ func main() {
 			a.Quit()
 		}
 	})
+
+	// Initial update of dimensions
+	updateBoardDimensions()
 
 	w.ShowAndRun()
 }

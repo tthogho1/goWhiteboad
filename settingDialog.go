@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"goWhiteBoard/config"
 	"image/color"
 
 	"fyne.io/fyne/v2"
@@ -31,11 +32,11 @@ func ShowSettingDialog(w fyne.Window, board *whiteboard) {
 
 	// Create buttons for input forms
 	EditSystemPrompt := widget.NewButton("System Prompt", func() {
-		showInputForm1(w, board)
+		showSystemPromptForm(w, board)
 	})
 
 	EditUserPrompt := widget.NewButton("User Prompt", func() {
-		showInputForm2(w, board)
+		showUserPromptForm(w, board)
 	})
 
 	// Create button container with horizontal layout
@@ -86,63 +87,69 @@ func ShowSettingDialog(w fyne.Window, board *whiteboard) {
 }
 
 // Input form for the first button
-func showInputForm1(w fyne.Window, board *whiteboard) {
-	entry := widget.NewEntry()
-	entry.SetPlaceHolder("Enter custom setting 1")
+func showSystemPromptForm(w fyne.Window, board *whiteboard) {
+	systemEntry := widget.NewMultiLineEntry()
+	systemEntry.SetText(config.APISystemMessage) // Set default value
 
-	var inputDialog dialog.Dialog
+	var systemInputModal *widget.PopUp	
 
 	form := &widget.Form{
 		Items: []*widget.FormItem{
-			{Text: "Setting 1", Widget: entry},
+			{Text: "SystemPrompt", Widget: systemEntry},
 		},
 		OnSubmit: func() {
 			// Process the input
-			_ = entry.Text
+			config.APISystemMessage = systemEntry.Text
 			// Here you can add code to handle the input value
 			// For example: board.customSetting1 = entry.Text
 
-			if inputDialog != nil {
-				inputDialog.Hide()
+			if systemInputModal != nil {
+				systemInputModal.Hide()
 			}
 		},
 		OnCancel: func() {
-			if inputDialog != nil {
-				inputDialog.Hide()
+			if systemInputModal != nil {
+				systemInputModal.Hide()
 			}
 		},
 	}
 
-	inputDialog = dialog.NewCustom("System Prompt", "Close", container.NewVBox(form), w)
+		// カスタムウィジェットを作成
+	content := container.NewVBox(
+		widget.NewLabel("System Prompt"),
+		form,
+	)
 
-	inputDialog.Resize(fyne.NewSize(300, 150))
-	inputDialog.Show()
+	systemInputModal = widget.NewModalPopUp(content, w.Canvas())
+	systemInputModal.Resize(fyne.NewSize(600, 200))
+	systemInputModal.Show()
 }
 
-// Input form for the second button
-func showInputForm2(w fyne.Window, board *whiteboard) {
-	entry := widget.NewEntry()
-	entry.SetPlaceHolder("Enter custom setting 2")
 
-	var inputDialog dialog.Dialog
+// Input form for the second button
+func showUserPromptForm(w fyne.Window, board *whiteboard) {
+	userEntry := widget.NewMultiLineEntry()
+	userEntry.SetText(config.APIUserMessage) // Set default value
+
+	var userInputModal *widget.PopUp	
 
 	form := &widget.Form{
 		Items: []*widget.FormItem{
-			{Text: "Setting 2", Widget: entry},
+			{Text: "UserPrompt", Widget: userEntry},
 		},
 		OnSubmit: func() {
 			// Process the input
-			_ = entry.Text
+			config.APIUserMessage = userEntry.Text
 			// Here you can add code to handle the input value
 			// For example: board.customSetting2 = entry.Text
 
-			if inputDialog != nil {
-				inputDialog.Hide()
+			if userInputModal != nil {
+				userInputModal.Hide()
 			}
 		},
 		OnCancel: func() {
-			if inputDialog != nil {
-				inputDialog.Hide()
+			if userInputModal != nil {
+				userInputModal.Hide()
 			}
 		},
 	}
@@ -154,8 +161,8 @@ func showInputForm2(w fyne.Window, board *whiteboard) {
 	)
 
 	// モーダルをカスタムで表示
-	modal := widget.NewModalPopUp(content, w.Canvas())
-	modal.Resize(fyne.NewSize(300, 150))
-	modal.Show()
+	userInputModal = widget.NewModalPopUp(content, w.Canvas())
+	userInputModal.Resize(fyne.NewSize(600, 200))
+	userInputModal.Show()
 
 }

@@ -2,9 +2,11 @@ package util
 
 import (
 	"bytes"
+
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"goWhiteBoard/config"
 	"io"
 	"log"
 	"net/http"
@@ -70,11 +72,8 @@ func SendImage(imageData []byte) string {
 	// 画像ファイルを読み込み、Base64エンコード
 	base64Encoded := base64.StdEncoding.EncodeToString(imageData)
 
-	system_message := "You are an Web Designer and image editor. You can edit the image. You can return image which improved. no Explanation just image."
-	//user_message := "Create improve image  from the freehands image of this and return only improved image by html. Draw basic clean image. No Explanation return just html."
-	user_message := "This freehand image should be neatly formatted and converted with basic Shapes like straight line, circle or square,etc  " +
-		" back to HTML and CSS. No explanation is required, just return the HTML."
-	//user_message := "Describe this image."
+	system_message := config.APISystemMessage
+	user_message := config.APIUserMessage
 	// リクエストボディを構築
 	requestBody := RequestBody{
 		Model:     model,

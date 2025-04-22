@@ -1,7 +1,11 @@
 package config
 
 var (
-	APISystemMessage = "You are an Web Designer and image editor. You can edit the image. You can return image which improved. no Explanation just image."
-	APIUserMessage   = "This freehand image should be neatly formatted and converted with basic Shapes like straight line, circle or square,etc  " +
-		" back to HTML and CSS. No explanation is required, just return the HTML."
+	APISystemMessage = "You are an expert in IT system design. Please convert a hand-drawn system architecture diagram into a clear and well-organized diagram."
+	APIUserMessage   = "Based on the image below, accurately extract the elements and connections of the configuration diagram " +
+		"and reconstruct it into an organized configuration diagram. \n\n[Instructions]\n" +
+		"1. Accurately read and organize all elements included in the image \n" +
+		"2. Accurately understand the relationships and connections between the elements and reconstruct it into a logical configuration diagram. \n" +
+		"3. Provide the output as an HTML file. \n" +
+		"4. Please correct any freehand distortions with an emphasis on the readability of the diagram using line , curve ,circle ,squire ,Square,triangle, etc..."
 )
